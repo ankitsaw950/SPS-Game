@@ -10,7 +10,7 @@ const googleStrategy = new GoogleStrategy(
   async (accessToken, refreshToken, profile, done) => {
     
     try {
-        loginWithGoogle(profile,done);
+      loginWithGoogle(profile,done);
     } catch (error) {
       return done(error, null);
     }

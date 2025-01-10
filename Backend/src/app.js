@@ -18,7 +18,7 @@ app.use(express.static("public"))
 app.use(cookieParser())
 app.use(
     session({
-      secret: process.env.SESSION_SECRET,
+      secret: "isdfhnoifjnoi3294832",
       resave: false,
       saveUninitialized: false,
     })
@@ -33,8 +33,8 @@ import userRoute from './routes/user.routes.js'
 import authRoute from './routes/auth.routes.js'
 
 //route declaration
-app.use(/api/v1/spsgame,spsGameRoute);
-app.use(/api/v1/user,userRoute)
-app.use(/api/v1/auth,authRoute)
+app.use("/api/v1/spsgame",spsGameRoute);
+app.use("/api/v1/user",userRoute)
+app.use("/api/v1/auth",authRoute)
 
 export {app}

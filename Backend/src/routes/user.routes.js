@@ -1,4 +1,4 @@
-import { Router }  from " express "
+import { Router }  from "express"
 
 import { 
     registerUser,
@@ -8,7 +8,7 @@ import {
     changeCurrentPassword,
     updateAccountDetails, 
     updateImage
-}  from "../controllers/user.controller"
+}  from "../controllers/user.controller.js"
 
 import { upload } from "../middlewares/multer.middleware.js"
 
