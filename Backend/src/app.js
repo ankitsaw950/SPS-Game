@@ -31,6 +31,7 @@ app.use(passport.session());
 import spsGameRoute from './routes/spsGame.routes.js'
 import userRoute from './routes/user.routes.js'
 import authRoute from './routes/auth.routes.js'
+import errorHandlerMiddleware from './middlewares/errorHandler.middleware.js'
 
 //route declaration
 app.use("/api/v1/spsgame",spsGameRoute);
@@ -38,8 +39,8 @@ app.use("/api/v1/user",userRoute)
 app.use("/api/v1/auth",authRoute)
 
 
-
-
+// Use the error handler (must be last)
+app.use(errorHandlerMiddleware);
 
 
 export {app}

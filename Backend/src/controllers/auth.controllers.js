@@ -17,6 +17,7 @@ const loginWithGoogle = async (userData, cb) => {
       if (!existingUser.oauthProvider || existingUser.oauthId !== sub) {
         existingUser.oauthProvider = provider;
         existingUser.oauthId = sub;
+        existingUser.isVerified = true;
         await existingUser.save({ validateBeforeSave: false });
       }
 
@@ -31,6 +32,7 @@ const loginWithGoogle = async (userData, cb) => {
         image: picture,
         oauthProvider: provider,
         oauthId: sub,
+        isVerified: true,
       });
 
       // console.log(newUser)
@@ -52,6 +54,7 @@ const loginWithGithub = async (userData, cb) => {
       if (!existingUser.oauthProvider || existingUser.oauthId !== node_id) {
         existingUser.oauthProvider = provider;
         existingUser.oauthId = node_id;
+        existingUser.isVerified = true;
         await existingUser.save({ validateBeforeSave: false });
       }
 
@@ -64,6 +67,7 @@ const loginWithGithub = async (userData, cb) => {
         image: avatar_url,
         oauthProvider: provider,
         oauthId: node_id,
+        isVerified: true,
       });
       return cb(null, newUser);
     }

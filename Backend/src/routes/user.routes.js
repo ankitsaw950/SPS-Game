@@ -7,7 +7,8 @@ import {
     refreshAccessToken,
     changeCurrentPassword,
     updateAccountDetails, 
-    updateImage
+    updateImage,
+    verifyEmail
 }  from "../controllers/user.controller.js"
 
 import { upload } from "../middlewares/multer.middleware.js"
@@ -22,6 +23,7 @@ router.route("/register").post(upload.single("image") , registerUser)
 
 router.route("/login").post(loginUser)
 
+router.route("/verify-email").get(verifyEmail)
 
 // Secured Routes : Routes that requires user to be logined
 // The verify middleware will be used in every routes

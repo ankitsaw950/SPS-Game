@@ -4,6 +4,11 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
+import {
+  Verification_Email_Template,
+  Welcome_Email_Template,
+} from "../utils/EmailTemplate.js";
+import { sendEmail } from "../utils/EmailSender.js";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -50,8 +55,6 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Error while getting file path from the local");
   }
 
-  console.log(imageLocalPath);
-
   const image = await uploadOnCloudinary(imageLocalPath);
 
   if (!image) {
@@ -76,10 +79,22 @@ const registerUser = asyncHandler(async (req, res) => {
       "Something went wrong while r=registering the user"
     );
   }
-
+  const emailVerifcationToken = createdUser.generateEmailVerificationToken();
+  const link = `http://localhost:8000/api/v1/user/verify-email?token=${emailVerifcationToken}`;
+  const htmlContent = Verification_Email_Template.replace(
+    "{Verification_Link}",
+    link
+  ).replace("{user_name}", createdUser.fullName);
+  await sendEmail(createdUser.email, "Verify your email", htmlContent);
   return res
     .status(201)
-    .json(new ApiResponse(200, createdUser, "User registered successfully"));
+    .json(
+      new ApiResponse(
+        200,
+        createdUser,
+        "User registered ! please verify email before login "
+      )
+    );
 });
 
 // TODO : Login the user
@@ -96,6 +111,13 @@ const loginUser = asyncHandler(async (req, res) => {
 
   if (!user) {
     throw new ApiError(404, "User Does not exist");
+  }
+
+  if (!user.isVerified) {
+    throw new ApiError(
+      403,
+      "User is not verified. Please verify your email before login"
+    );
   }
 
   const isPasswordValid = await user.isPasswordCorrect(password);
@@ -292,6 +314,43 @@ const updateImage = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "Image updated successfully"));
 });
 
+const verifyEmail = asyncHandler(async (req, res) => {
+  const { token } = req.query;
+
+  if (!token) {
+    throw new ApiError(400, "Token is required");
+  }
+
+  try {
+    const decodedToken = jwt.verify(
+      token,
+      process.env.EMAIL_VERIFICATION_SECRET
+    );
+
+    const user = await User.findByIdAndUpdate(
+      decodedToken?._id,
+      { $set: { isVerified: true } },
+      { new: true }
+    ).select("-password -refreshToken");
+
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+
+    const htmlContent = Welcome_Email_Template.replace(
+      "{user_name}",
+      user.fullName
+    ).replace("[Account Link]", "http://localhost:8000");
+    await sendEmail(user.email, "Welcome to SPS Game!", htmlContent);
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, user, "Email verified successfully"));
+  } catch (error) {
+    throw new ApiError(401, error?.message || "Invalid token");
+  }
+});
+
 export {
   registerUser,
   loginUser,
@@ -301,4 +360,5 @@ export {
   updateAccountDetails,
   updateImage,
   generateAccessAndRefreshTokens,
+  verifyEmail,
 };
