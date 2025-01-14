@@ -5,9 +5,10 @@ import githubStrategy from "../passport/githubStrategy.js";
 passport.use(googleStrategy);
 passport.use(githubStrategy);
 
-passport.serializeUser((user, done) => {
-  if (user) {
-    done(null, user); 
+passport.serializeUser((userData, done) => {
+  if (userData) {
+    
+    done(null, userData); 
   } else {
     done(new Error("No user found"), null);
   }

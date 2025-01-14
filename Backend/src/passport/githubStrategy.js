@@ -8,7 +8,6 @@ const githubStrategy = new GitHubStrategy(
     callbackURL: process.env.GITHUB_CALLBACK_URL,
   },
   async (accessToken, refreshToken, profile, done) => {
-    // Find or create user in the database
     try {
       loginWithGithub(profile, done);
     } catch (error) {

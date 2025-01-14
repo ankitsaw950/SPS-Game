@@ -31,10 +31,13 @@ app.use(passport.session());
 import spsGameRoute from './routes/spsGame.routes.js'
 import userRoute from './routes/user.routes.js'
 import authRoute from './routes/auth.routes.js'
+import { verifyJWT } from './middlewares/auth.middleware.js'
 
 //route declaration
 app.use("/api/v1/spsgame",spsGameRoute);
 app.use("/api/v1/user",userRoute)
 app.use("/api/v1/auth",authRoute)
-
+app.get('/user', verifyJWT , function (req, res) {
+  res.send(req.user);
+})
 export {app}
